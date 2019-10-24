@@ -2,8 +2,17 @@ from generic.EuclideanDomain import EuclideanDomain
 
 
 class GaussianIntegers(EuclideanDomain):
+
+    # Proof of degree's validity
+    # http://fermatslasttheorem.blogspot.com/2005/06/division-algorithm-for-gaussian.html
     def div_mod(self, elem1, elem2):
-        pass
+        a, b = elem1
+        c, d = elem2
+        norm2 = c ** 2 + d ** 2
+        r, s = round((a * c + b * d) / norm2), round((b * c - a * d) / norm2)
+        coc = (r, s)
+        rem = self.add(elem1, self.add_inv(self.mul(coc, elem2)))
+        return coc, rem
 
     def add_id(self):
         return 0, 0
