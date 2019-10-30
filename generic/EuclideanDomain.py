@@ -3,6 +3,7 @@ from generic.UFD import UFD
 
 
 class EuclideanDomain(UFD):
+
     def div(self, elem1, elem2):
         return divmod(elem1, elem2)[0]
 
