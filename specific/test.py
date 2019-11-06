@@ -21,9 +21,11 @@ from specific.Zp import Zp
 # print(PZ.add(Polynomial([1, 2], ZZ), Polynomial([1, 2, 3], ZZ)).coefs)
 # print(PZ.mul(Polynomial([1, 2], ZZ), Polynomial([1, 2, 3], ZZ)).coefs)
 
-Z11 = Zp(11)
-print(Z11.mul_inv(5))
-print(Z11.mul_inv(1))
-Z4 = FiniteField(2, 2, Polynomial([1, 1, 1], Zp(2)))
-print(Z4.mul_inv(Polynomial([1, 1], Zp(2))))
-
+Z3 = Zp(3)
+PZ3 = Polynomials(Z3)
+a, b = PZ3.div_mod(Polynomial([1, 2, 1], Z3), Polynomial([1, 1], Z3))
+print(a.coefs, b.coefs)
+a, b = PZ3.div_mod(Polynomial([1, 2, 1], Z3), Polynomial([0, 1], Z3))
+print(a.coefs, b.coefs)
+a, b = PZ3.div_mod(Polynomial([1, 2, 1], Z3), Polynomial([1], Z3))
+print(a.coefs, b.coefs)
