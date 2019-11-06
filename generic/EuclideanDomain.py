@@ -23,6 +23,7 @@ class EuclideanDomain(UFD):
         return a
 
     # Extended euclidean algorithm for gcd + Bezout's coefficients
+    # a*s + b*t = d
     def extended_gcd(self, a, b):
         r, rp = a, b
         s, sp = self.mul_id(), self.add_id()

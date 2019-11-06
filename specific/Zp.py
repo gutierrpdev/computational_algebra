@@ -7,10 +7,8 @@ class Zp(Field):
         self.p = p
 
     def mul_inv(self, elem):
-        pass
-
-    def div_mod(self, elem1, elem2):
-        pass
+        _, d, _ = self.extended_gcd(elem, self.p)
+        return d % self.p
 
     def add_id(self):
         return 0
@@ -19,10 +17,10 @@ class Zp(Field):
         return 1
 
     def add_inv(self, elem):
-        pass
+        return self.p - (elem % self.p)
 
     def add(self, elem1, elem2):
         return (elem1 + elem2) % self.p
 
     def mul(self, elem1, elem2):
-        pass
+        return (elem1 * elem2) % self.p
