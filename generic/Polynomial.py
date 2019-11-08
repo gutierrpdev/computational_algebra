@@ -4,7 +4,10 @@ from generic.Ring import Ring
 class Polynomial:
 
     def __init__(self, coefs, base_ring):
-        self.coefs = coefs
+        i = len(coefs) - 1
+        while i > 0 and coefs[i] == base_ring.add_id():
+            i -= 1
+        self.coefs = coefs[:i+1]
         self.base_ring = base_ring
 
     def degree(self):

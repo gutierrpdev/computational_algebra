@@ -8,36 +8,42 @@ from generic.Polynomial import Polynomial
 class Polynomials(EuclideanDomain):
 
     def div_mod(self, elem1, elem2):
+        if elem1.degree() < elem2.degree():
+            return Polynomial([self.base_field.add_id()], self.base_field), elem1
+
         elem1.coefs.reverse()
         elem2.coefs.reverse()
+
         quotient, remainder = self.extended_synthetic_division(elem1.coefs, elem2.coefs)
+        quotient.reverse()
+        remainder.reverse()
         return Polynomial(quotient, self.base_field), Polynomial(remainder, self.base_field)
 
     def __init__(self, base_field):
         self.base_field = base_field
 
     def add_id(self):
-        return Polynomial([self.base_ring.add_id()], self.base_ring)
+        return Polynomial([self.base_field.add_id()], self.base_field)
 
     def mul_id(self):
-        return Polynomial([self.base_ring.mul_id()], self.base_ring)
+        return Polynomial([self.base_field.mul_id()], self.base_field)
 
     def add_inv(self, elem):
-        lis = list(map(lambda x: self.base_ring.add_inv(x), elem.coefs))
-        return Polynomial(lis, self.base_ring)
+        lis = list(map(lambda x: self.base_field.add_inv(x), elem.coefs))
+        return Polynomial(lis, self.base_field)
 
     def add(self, elem1, elem2):
-        lis = list(map(lambda x1, x2: self.base_ring.add(x1, x2), elem1.coefs, elem2.coefs))
+        lis = list(map(lambda x1, x2: self.base_field.add(x1, x2), elem1.coefs, elem2.coefs))
         lis.extend(elem1.coefs[len(lis):])
         lis.extend(elem2.coefs[len(lis):])
-        return Polynomial(lis, self.base_ring)
+        return Polynomial(lis, self.base_field)
 
     def mul(self, elem1, elem2):
         res = [0] * (elem1.degree() + elem2.degree() + 1)
         for in1, e1 in enumerate(elem1.coefs):
             for in2, e2 in enumerate(elem2.coefs):
-                res[in1 + in2] += self.base_ring.mul(e1, e2)
-        return Polynomial(res, self.base_ring)
+                res[in1 + in2] += self.base_field.mul(e1, e2)
+        return Polynomial(res, self.base_field)
 
     # Fast polynomial division by using Extended Synthetic Division.
     def extended_synthetic_division(self, dividend, divisor):

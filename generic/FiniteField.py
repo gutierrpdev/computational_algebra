@@ -14,6 +14,17 @@ class FiniteField(Field):
         _, d, _ = self.extended_gcd(elem, self.f)
         return d
 
+    def div_mod(self, elem1, elem2):
+        # make both polynomials of degree lower than f's
+        elem1 = self.rep(elem1)
+        elem2 = self.rep(elem2)
+
+        # make sure that elem1 has a higher degree than elem2's.
+        # note that adding f is essentially no different from adding 0 in this field.
+        elem1 = self.field.add(self.f, elem1)
+
+        return self.field.div_mod(elem1, elem2)
+
     def add_id(self):
         return Polynomial([0], self.field)
 
@@ -21,10 +32,14 @@ class FiniteField(Field):
         return Polynomial([1], self.field)
 
     def add_inv(self, elem):
-        pass
+        return self.rep(self.field.add_inv(elem))
 
     def add(self, elem1, elem2):
-        pass
+        return self.rep(self.field.add(elem1, elem2))
 
     def mul(self, elem1, elem2):
-        pass
+        return self.rep(self.field.mul(elem1, elem2))
+
+    # elem's equivalence class
+    def rep(self, elem):
+        return self.field.div_mod(elem, self.f)[1]
