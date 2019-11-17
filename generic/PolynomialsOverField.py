@@ -5,7 +5,7 @@ from generic.Polynomial import Polynomial
 # Basic implementation of a Polynomial RING over a Field.
 # Note that the Ring K[X], where K is a Field, is in fact a Euclidean Domain and thus the Euclidean Algorithms
 # may be used within our construction.
-class Polynomials(EuclideanDomain):
+class PolynomialsOverField(EuclideanDomain):
 
     def div_mod(self, elem1, elem2):
         if elem1.degree() < elem2.degree():
@@ -13,7 +13,6 @@ class Polynomials(EuclideanDomain):
 
         elem1.coefs.reverse()
         elem2.coefs.reverse()
-
         quotient, remainder = self.extended_synthetic_division(elem1.coefs, elem2.coefs)
         quotient.reverse()
         remainder.reverse()
@@ -59,5 +58,12 @@ class Polynomials(EuclideanDomain):
                     # because it is only used to normalize the dividend coefficients
                     aux = self.base_field.add_inv(self.base_field.mul(divisor[j], coef))
                     out[i + j] = self.base_field.add(out[i + j], aux)
-        separator = 1 - len(divisor)
-        return out[:separator], out[separator:]  # return quotient, remainder.
+        separator = len(dividend) - len(divisor) + 1
+        quotient = out[:separator]
+        remainder = out[separator:]
+
+        if len(quotient) == 0:
+            quotient = [self.base_field.add_id()]
+        if len(remainder) == 0:
+            remainder = [self.base_field.add_id()]
+        return quotient,  remainder  # return quotient, remainder.

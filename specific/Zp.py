@@ -1,4 +1,5 @@
 from generic.Field import Field
+from specific.ZZ import ZZ
 
 
 class Zp(Field):
@@ -7,7 +8,7 @@ class Zp(Field):
         self.p = p
 
     def mul_inv(self, elem):
-        _, d, _ = self.extended_gcd(elem, self.p)
+        _, d, _ = ZZ().extended_gcd(elem, self.p)
         return d % self.p
 
     def add_id(self):

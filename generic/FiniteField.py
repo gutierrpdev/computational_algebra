@@ -1,6 +1,6 @@
 from generic.Field import Field
 from generic.Polynomial import Polynomial
-from generic.Polynomials import Polynomials
+from generic.PolynomialsOverField import PolynomialsOverField
 from specific.Zp import Zp
 
 
@@ -8,11 +8,7 @@ class FiniteField(Field):
 
     def __init__(self, p, k, f):
         self.p, self.k, self.f = p, k, f
-        self.field = Polynomials(Zp(p))
-
-    def mul_inv(self, elem):
-        _, d, _ = self.extended_gcd(elem, self.f)
-        return d
+        self.field = PolynomialsOverField(Zp(p))
 
     def div_mod(self, elem1, elem2):
         # make both polynomials of degree lower than f's

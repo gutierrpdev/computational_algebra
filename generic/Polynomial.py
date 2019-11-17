@@ -1,6 +1,3 @@
-from generic.Ring import Ring
-
-
 class Polynomial:
 
     def __init__(self, coefs, base_ring):
@@ -20,4 +17,9 @@ class Polynomial:
         return self.base_ring
 
     def get_leading_coef(self):
-        return self.coefs[self.size()]
+        return self.coefs[self.degree()]
+
+    def __eq__(self, other):
+        if isinstance(other, Polynomial):
+            return self.coefs == other.coefs and (type(self.base_ring) is type(other.base_ring))
+        return NotImplemented
