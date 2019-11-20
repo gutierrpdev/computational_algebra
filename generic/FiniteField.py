@@ -10,6 +10,9 @@ class FiniteField(Field):
         self.p, self.k, self.f = p, k, f
         self.field = PolynomialsOverField(Zp(p))
 
+    def cardinality(self):
+        return self.p ** self.k
+
     def div_mod(self, elem1, elem2):
         # make both polynomials of degree lower than f's
         elem1 = self.rep(elem1)
@@ -39,3 +42,11 @@ class FiniteField(Field):
     # elem's equivalence class
     def rep(self, elem):
         return self.field.div_mod(elem, self.f)[1]
+
+
+if __name__ == "__main__":
+    F9 = FiniteField(3, 2, Polynomial([2, 1, 1], Zp(3)))
+    aux = F9.div(F9.mul_id(), Polynomial([0, 1], Zp(3)))
+    aux2 = F9.mul_inv(Polynomial([0, 1], Zp(3)))
+    assert(aux == aux2)
+    print(F9.mul(aux, Polynomial([0, 1], Zp(3))).coefs)
