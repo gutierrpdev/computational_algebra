@@ -21,5 +21,22 @@ class Polynomial:
 
     def __eq__(self, other):
         if isinstance(other, Polynomial):
-            return self.coefs == other.coefs and (type(self.base_ring) is type(other.base_ring))
+            if len(self.coefs) != len(other.coefs):
+                return False
+            is_same = True
+            for i in range(0, len(self.coefs)):
+                is_same = is_same and self.coefs[i] == other.coefs[i]
+            return is_same
         return NotImplemented
+
+    def __str__(self):
+        return str(self.coefs)
+
+    def __repr__(self):
+        # aux = ""
+        # for i in range(0, len(self.coefs)):
+        #     if self.coefs[i] != self.base_ring.add_id():
+        #         aux += (self.coefs[i]).__str__() + "*X^" + str(i) + " + "
+        # return aux
+        return str(self.coefs)
+

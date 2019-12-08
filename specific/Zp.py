@@ -18,10 +18,18 @@ class Zp(Field):
         return 1
 
     def add_inv(self, elem):
-        return self.p - (elem % self.p)
+        return (self.p - (elem % self.p)) % self.p
 
     def add(self, elem1, elem2):
         return (elem1 + elem2) % self.p
 
     def mul(self, elem1, elem2):
         return (elem1 * elem2) % self.p
+
+    def cardinality(self):
+        return self.p
+
+    def __eq__(self, other):
+        if isinstance(other, Zp):
+            return self.p == other.p
+        return NotImplemented

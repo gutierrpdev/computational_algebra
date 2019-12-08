@@ -11,9 +11,11 @@ class PolynomialsOverField(EuclideanDomain):
         if elem1.degree() < elem2.degree():
             return Polynomial([self.base_field.add_id()], self.base_field), elem1
 
-        elem1.coefs.reverse()
-        elem2.coefs.reverse()
-        quotient, remainder = self.extended_synthetic_division(elem1.coefs, elem2.coefs)
+        a = list(elem1.coefs)
+        a.reverse()
+        b = list(elem2.coefs)
+        b.reverse()
+        quotient, remainder = self.extended_synthetic_division(a, b)
         quotient.reverse()
         remainder.reverse()
         return Polynomial(quotient, self.base_field), Polynomial(remainder, self.base_field)
@@ -38,10 +40,10 @@ class PolynomialsOverField(EuclideanDomain):
         return Polynomial(lis, self.base_field)
 
     def mul(self, elem1, elem2):
-        res = [0] * (elem1.degree() + elem2.degree() + 1)
+        res = [self.base_field.add_id()] * (elem1.degree() + elem2.degree() + 1)
         for in1, e1 in enumerate(elem1.coefs):
             for in2, e2 in enumerate(elem2.coefs):
-                res[in1 + in2] += self.base_field.mul(e1, e2)
+                res[in1 + in2] = self.base_field.add(res[in1 + in2], self.base_field.mul(e1, e2))
         return Polynomial(res, self.base_field)
 
     # Fast polynomial division by using Extended Synthetic Division.
