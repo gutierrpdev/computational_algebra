@@ -1,5 +1,3 @@
-import copy
-
 from generic.FiniteField import FiniteField
 from generic.PolynomialsOverField import PolynomialsOverField
 from generic.Polynomial import Polynomial
@@ -21,6 +19,46 @@ class PolynomialsOverFq(PolynomialsOverField):
             if self.div(gcd, Polynomial([gcd.get_leading_coef()], self.base_field)) != self.mul_id():
                 return False
         return True
+
+    # perform the SFD algorithm to compute a square free decomposition of a monic polynomial f.
+    def square_free_decomposition(self, f):
+        _L = []
+        s = 1
+        while True:
+            j = 1
+            g = self.div(f, self.gcd(f, f.derivative()))
+            print("g: ", g)
+            while g != self.mul_id():
+                print("g_loop: ", g)
+                f = self.div(f, g)
+                h = self.gcd(f, g)
+                m = self.div(g, h)
+                if m != self.mul_id():
+                    _L.append((m, j*s))
+                g = h
+                j += 1
+            if f != self.mul_id():
+                print("f_loop: ", f)
+                f = self.pth_root(f)
+                print("p-th root: ", f)
+                s = self.base_field.p * s
+
+            if f == self.mul_id():
+                break
+        return _L
+
+    def pth_root(self, f):
+        # f = g(X^p), with g in PolynomialsOverFq
+        g = []
+        i = 0
+        # x^4 + x^2 + 1 -> x^2 + x + 1 (p = 2)
+        while i <= f.degree():
+            g.append(f.coefs[i])
+            i += self.base_field.p
+
+        print("g*: ", g)
+        h = [self.base_field.exp(a, self.base_field.p**(self.base_field.k - 1)) for a in g]
+        return Polynomial(h, f.base_ring)
 
 
 if __name__ == "__main__":
@@ -87,3 +125,14 @@ if __name__ == "__main__":
     # True
     # False
     # True
+
+    print("-------------------------------------")
+    print("Check if SFD Algorithm works properly...")
+    F4X = PolynomialsOverFq(F4)
+    li = F4X.square_free_decomposition(Polynomial([F4One, F4Zero, F4One], F4))
+    print(li)
+    li = F4X.square_free_decomposition(Polynomial([F4Zero, F4Zero, F4One], F4))
+    print(li)
+    li = F4X.square_free_decomposition(Polynomial([F4AlphaPlusOne, F4Zero, F4One], F4))
+    print(li)
+

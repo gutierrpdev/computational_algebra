@@ -26,6 +26,9 @@ class Zp(Field):
     def mul(self, elem1, elem2):
         return (elem1 * elem2) % self.p
 
+    def mul_scalar(self, elem, scalar):
+        return (elem * scalar) % self.p
+
     def cardinality(self):
         return self.p
 
