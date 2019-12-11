@@ -58,6 +58,7 @@ class PolynomialsOverFq(PolynomialsOverField):
 
         print("g*: ", g)
         h = [self.base_field.exp(a, self.base_field.p**(self.base_field.k - 1)) for a in g]
+        print("h*: ", h)
         return Polynomial(h, f.base_ring)
 
 

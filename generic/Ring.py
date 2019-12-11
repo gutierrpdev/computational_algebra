@@ -37,6 +37,6 @@ class Ring(ABC):
         if scalar == 0:
             return self.mul_id()
         elif scalar > 0:
-            for i in range(scalar):
+            for i in range(scalar-1):
                 res = self.mul(res, elem)
         return res
