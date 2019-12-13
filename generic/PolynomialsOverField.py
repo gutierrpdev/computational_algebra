@@ -1,3 +1,5 @@
+from functools import reduce
+
 from generic.EuclideanDomain import EuclideanDomain
 from generic.Polynomial import Polynomial
 
@@ -45,6 +47,19 @@ class PolynomialsOverField(EuclideanDomain):
             for in2, e2 in enumerate(elem2.coefs):
                 res[in1 + in2] = self.base_field.add(res[in1 + in2], self.base_field.mul(e1, e2))
         return Polynomial(res, self.base_field)
+
+    # perform multiplication by element in field
+    def mul_field_scalar(self, elem, f_scalar):
+        return Polynomial([self.base_field.mul(x, f_scalar) for x in elem.coefs], self.base_field)
+
+    # given polynomial f, compute f(v)
+    def evaluate_polynomial(self, f, v):
+        res = []
+        acc = self.mul_id()
+        for i in range(f.degree()+1):
+            res.append(self.mul_field_scalar(acc, f.coefs[i]))
+            acc = self.mul(acc, v)
+        return reduce(self.add, res)
 
     # Fast polynomial division by using Extended Synthetic Division.
     def extended_synthetic_division(self, dividend, divisor):

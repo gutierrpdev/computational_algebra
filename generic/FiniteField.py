@@ -1,3 +1,5 @@
+import random
+
 from generic.Field import Field
 from generic.Polynomial import Polynomial
 from generic.PolynomialsOverField import PolynomialsOverField
@@ -55,6 +57,12 @@ class FiniteField(Field):
     def rep(self, elem):
         return self.field.div_mod(elem, self.f)[1]
 
+    def random_elem(self):
+        elem = []
+        for i in range(self.k):
+            elem.append(random.randrange(self.p))
+        return Polynomial(elem, Zp(self.p))
+
     def __eq__(self, other):
         if isinstance(other, FiniteField):
             return self.p == other.p and self.k == other.k
@@ -85,3 +93,9 @@ if __name__ == "__main__":
     print(F4.mul_inv(F4One))
     print(F4.mul_inv(F4Alpha))
     print(F4.mul_inv(F4AlphaPlusOne))
+
+    print("Generate some random elements of F4")
+    print(F4.random_elem())
+    print(F4.random_elem())
+    print(F4.random_elem())
+    print(F4.random_elem())

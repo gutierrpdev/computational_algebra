@@ -1,5 +1,7 @@
 import copy
+from functools import reduce
 
+from generic.FiniteField import FiniteField
 from generic.Polynomial import Polynomial
 from specific.PolynomialsOverFq import PolynomialsOverFq
 from specific.Zp import Zp
@@ -15,7 +17,12 @@ class Berlekamp:
         self._l = f.degree()
 
     def compute(self):
-        self.step_b1()
+        base = self.step_b1()
+        return self.step_b2(base)
+
+    # elem is an element in F[X]
+    def rep(self, elem):
+        return self.fx.rem(elem, self.f)
 
     # Compute a Berlekamp basis for E := F[X]/(f), where f is a polynomial over F
     def step_b1(self):
@@ -26,29 +33,69 @@ class Berlekamp:
         # compute alpha = xi^q through repeated squaring.
         # we do this by making all calculations on F[X] and then computing the associated elements in E via rem with f.
         alpha = self.fx.exp(xi, self.field.cardinality())
-        alpha = self.fx.rem(alpha, self.f)
+        alpha = self.rep(alpha)
 
         # beta = 1_E, no quotient needed in this case.
         beta = self.fx.mul_id()
 
-        for i in range(self.l):
+        for i in range(self._l):
             # Row_i(Q) = Vec_S(beta)
             q_matrix.append(self.vec_s(copy.deepcopy(beta.coefs)))
             # Q[i][i] = Q[i][i] - 1
             q_matrix[i][i] = self.field.add(q_matrix[i][i], self.field.add_inv(self.field.mul_id()))
             # beta = beta * alpha
-            beta = self.fx.rem(self.fx.mul(beta, alpha), self.f)
+            beta = self.rep(self.fx.mul(beta, alpha))
+        print("Q = ", q_matrix)
 
-        # compute a basis of of the row null space of Q
-        self.gaussian_elimination(q_matrix)
+        # compute a basis of the row null space of Q
+        _, x_matrix = self.gaussian_elimination(q_matrix)
+        res = [Polynomial(elem, self.field) for elem in x_matrix]
+        print("base = ", res)
+        return res
+
+    def step_b2(self, base):
+        h_list = [self.f]
+        base_list = [self.rep(elem) for elem in base]
+        m1_computed = self.m1()
+        h_p = []
+
+        while len(h_list) < len(base_list):
+            g_aux = [self.fx.mul_field_scalar(gi, self.field.random_elem()) for gi in base_list]
+            # g = c1 * g1 + ... + cr * gr (in F[X])
+            g = reduce(self.fx.add, g_aux)
+            h_p = []
+            for h in h_list:
+                # beta = [g]_h (in F[X]/(h))
+                beta = self.fx.rem(g, h)
+                # compute rep(M1(beta))
+                eval_m1_beta = self.rep(self.fx.evaluate_polynomial(m1_computed, beta))
+                d = self.fx.gcd(eval_m1_beta, h)
+                if d == self.fx.mul_id() or d == h or d.degree() < 1:
+                    h_p.append(h)
+                else:
+                    h_p.append(d)
+                    h_p.append(self.fx.div(h, d))
+            h_list = h_p
+        return h_p
+
+    def m1(self):
+        coefs = []
+        if self.field.p > 2:
+            coefs = [self.field.add_id()] * ((self.field.cardinality() - 1) / 2 + 1)
+            coefs[(self.field.cardinality() - 1) / 2] = self.field.mul_id()
+            coefs[0] = self.field.add_inv(self.field.add_id())
+        else:
+            # 1 + X^2 + X^4 + ...
+            coefs = [self.field.mul_id() if i % 2 == 0 else self.field.add_id() for i in range(2 * self.field.k - 1)]
+        return Polynomial(coefs, self.field)
 
     # coordinates of beta in standard basis S = {1, X, X^2,..., X^l}
     def vec_s(self, beta):
-        res = [self.field.add_id()] * self.l
+        res = [self.field.add_id()] * self._l
         res[:len(beta)] = beta
         return res
 
-    # returns gaussian elimination of matrix, matrix whose m-n last rows form a basis for the row null space of matrix
+    # returns (gaussian elimination of matrix, basis for the row null space of matrix)
     def gaussian_elimination(self, _matrix):
         q_matrix = copy.deepcopy(_matrix)
         f_one = self.field.mul_id()
@@ -93,7 +140,8 @@ class Berlekamp:
                         # Row_i(B) = Row_i(B) - B(i, j) * Row_r(B)
                         aux = [self.field.add_inv(self.field.mul(q_matrix[_i][j], x)) for x in q_matrix[r]]
                         q_matrix[_i] = [self.field.add(x, y) for x, y in zip(q_matrix[_i], aux)]
-        return q_matrix, x_matrix
+        print("x_matrix:", x_matrix)
+        return q_matrix, x_matrix[-(r+1):]
 
 
 if __name__ == "__main__":
@@ -103,3 +151,17 @@ if __name__ == "__main__":
     print(".............")
     print(change)
     print(elimination)
+
+    F4 = FiniteField(2, 2, Polynomial([1, 1, 1], Zp(2)))
+    F4One = F4.mul_id()
+    F4Zero = F4.add_id()
+    F4Alpha = Polynomial([0, 1], Zp(2))
+    F4AlphaPlusOne = Polynomial([1, 1], Zp(2))
+    f = Polynomial([F4Alpha, F4AlphaPlusOne, F4One], F4)
+    print(".............")
+    print(Berlekamp(f).step_b1())
+
+    print(".............")
+    print("Compute factorization through Berkelamp's algorithm")
+    print(Berlekamp(f).step_b2([Polynomial([F4One], F4), Polynomial([F4Zero, F4One], F4)]))
+
