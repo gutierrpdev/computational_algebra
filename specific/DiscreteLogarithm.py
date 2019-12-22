@@ -70,9 +70,6 @@ class DiscreteLogarithm:
             x2i, a2i, b2i = self._f(self._f(x2i)), self._h(self._f(x2i), self._h(x2i, a2i)), \
                             self._g(self._f(x2i), self._g(x2i, b2i))
 
-            print(xi, ai, bi)
-            print(x2i, a2i, b2i)
-
             if xi == x2i:
                 r = bi - b2i
                 if r == 0:
