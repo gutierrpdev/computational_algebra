@@ -29,7 +29,7 @@ class DiscreteLogarithm:
         for x in elem.coefs:
             res += x * acc
             acc *= self.finite_field.p
-        return res % 3
+        return (res+1) % 3
 
     def _f(self, elem):
         subset = self.subset(elem)
@@ -45,27 +45,27 @@ class DiscreteLogarithm:
         if subset == 0:
             return n
         elif subset == 1:
-            return (2 * n) % self.q
+            return (2 * n) % self.p
         else:
-            return (n + 1) % self.q
+            return (n + 1) % self.p
 
     def _g(self, elem, n):
         subset = self.subset(elem)
         if subset == 0:
-            return (n + 1) % self.q
+            return (n + 1) % self.p
         elif subset == 1:
-            return (2 * n) % self.q
+            return (2 * n) % self.p
         else:
             return n
 
     def pollard(self):
-        ai, bi, xi = 1, 1, self.finite_field.mul(self.g, self.h)
-        a2i, b2i, x2i = 1, 1, self.finite_field.mul(self.g, self.h)
-        print("subset x:", self.subset(xi))
+        ai, bi, xi = 0, 0, self.finite_field.mul_id()
+        a2i, b2i, x2i = 0, 0, self.finite_field.mul_id()
 
         while True:
-            xi, ai, bi = self._f(xi), self._g(xi, ai), self._h(xi, bi)
-            x2i, a2i, b2i = self._f(self._f(x2i)), self._g(self._f(x2i), a2i), self._h(self._f(x2i), b2i)
+            xi, ai, bi = self._f(xi), self._h(xi, ai), self._g(xi, bi)
+            x2i, a2i, b2i = self._f(self._f(x2i)), self._h(self._f(x2i), self._h(x2i, a2i)), \
+                            self._g(self._f(x2i), self._g(x2i, b2i))
 
             print(xi, ai, bi)
             print(x2i, a2i, b2i)
@@ -74,7 +74,7 @@ class DiscreteLogarithm:
                 r = bi - b2i
                 if r == 0:
                     return None
-                x = ZZ().extended_gcd(r, self.p)[1] * (ai - a2i) % self.q
+                x = (ZZ().extended_gcd(r, self.p)[1] * (a2i - ai)) % self.p
                 return x
 
 
@@ -83,5 +83,5 @@ if __name__ == "__main__":
     F4Alpha = Polynomial([0, 1], Zp(2))
     F4AlphaPlusOne = Polynomial([1, 1], Zp(2))
     F4One = Polynomial([1], Zp(2))
-    _x = DiscreteLogarithm(F4Alpha, F4AlphaPlusOne, F4)
+    _x = DiscreteLogarithm(F4AlphaPlusOne, F4Alpha, F4)
     print(_x.pollard())
