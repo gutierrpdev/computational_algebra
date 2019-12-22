@@ -21,7 +21,8 @@ class DiscreteLogarithm:
 
     # given elem in polynomial form, we define subset(elem) as the result of converting the polynomial coefficients of
     # elem as a number base p to an integer base 10 mod 3 (we require 3 different subsets of approximately equal size
-    # in order for the algorithm to work as expected).
+    # in order for the algorithm to work as expected). Need mul_id not to be in set 1, therefore, we need to add
+    # one to the result.
     def subset(self, elem):
         res = 0
         acc = 1
@@ -31,6 +32,8 @@ class DiscreteLogarithm:
             acc *= self.finite_field.p
         return (res+1) % 3
 
+    # f is defined such a way that given an element, it can multiply by either g, h or itself. _g and _h are
+    # defined to return how many times we have multiplied by g and h.
     def _f(self, elem):
         subset = self.subset(elem)
         if subset == 0:
