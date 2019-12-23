@@ -30,7 +30,7 @@ class DiscreteLogarithm:
         for x in elem.coefs:
             res += x * acc
             acc *= self.finite_field.p
-        return (res+1) % 3
+        return (res + 1) % 3
 
     # f is defined such a way that given an element, it can multiply by either g, h or itself. _g and _h are
     # defined to return how many times we have multiplied by g and h.
@@ -83,5 +83,5 @@ if __name__ == "__main__":
     F4Alpha = Polynomial([0, 1], Zp(2))
     F4AlphaPlusOne = Polynomial([1, 1], Zp(2))
     F4One = Polynomial([1], Zp(2))
-    _x = DiscreteLogarithm(F4AlphaPlusOne, F4Alpha, F4)
+    _x = DiscreteLogarithm(F4AlphaPlusOne, F4One, F4)
     print(_x.pollard())
