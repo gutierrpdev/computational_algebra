@@ -32,11 +32,21 @@ class Ring(ABC):
         return res
 
     # compute elem**scalar (scalar must be >= 0)
-    def exp(self, elem, scalar):
-        res = copy.deepcopy(elem)
-        if scalar == 0:
+    # def exp(self, elem, scalar):
+    #     res = copy.deepcopy(elem)
+    #     if scalar == 0:
+    #         return self.mul_id()
+    #     elif scalar > 0:
+    #         for i in range(scalar-1):
+    #             res = self.mul(res, elem)
+    #     return res
+
+    def exp(self, x, n):
+        if n == 0:
             return self.mul_id()
-        elif scalar > 0:
-            for i in range(scalar-1):
-                res = self.mul(res, elem)
-        return res
+        elif n == 1:
+            return x
+        elif n % 2 == 0:
+            return self.exp(self.mul(x, x), n // 2)
+        elif n % 2 == 1:
+            return self.mul(x, self.exp(self.mul(x, x), (n - 1) // 2))
