@@ -1,8 +1,7 @@
 import copy
 
 from generic.Polynomial import Polynomial
-from specific.PolynomialsOverFq import PolynomialsOverFq
-
+from generic.PolynomialsOverField import PolynomialsOverField
 
 class CantorZassenhaus:
 
@@ -10,7 +9,7 @@ class CantorZassenhaus:
         # field = Fq, f = f, fx = F[X]
         self.field = f.base_ring
         self.f = f
-        self.fx = PolynomialsOverFq(f.base_ring)
+        self.fx = PolynomialsOverField(f.base_ring)
         self._l = f.degree()
 
     def distinct_degree_factorization(self):
@@ -25,7 +24,7 @@ class CantorZassenhaus:
             k += 1
             aux = self.fx.add(h, self.fx.add_inv(_X))
             g = self.fx.gcd(aux, fc)
-            if g != self.fx.mul_id():
+            if g.degree() > 1:
                 _L.append((g, k))
                 fc = self.fx.div(fc, g)
                 h = self.fx.rem(h, fc)
@@ -49,11 +48,13 @@ class CantorZassenhaus:
         return Polynomial(res, self.field)
 
     # f is a monic polynomial of degree l and k the number of times
-    def equal_degree_factorization(self, f, k):
+    def equal_degree_factorization(self, pol, k):
         mk = self.mk(k)
-        fc = copy.deepcopy(self.f)
-        r = f.degree() // k
+        fc = copy.deepcopy(pol)
+        r = pol.degree() // k
+        # print("r: ", r)
         _H = [fc]
+        # print("_H: ", _H)
         while len(_H) < r:
             _Hp = []
             for elem in _H:
@@ -61,20 +62,28 @@ class CantorZassenhaus:
                 eval_mk = self.fx.evaluate_polynomial(mk, alpha)
                 eval_mk = self.fx.rem(eval_mk, fc)
                 d = self.fx.gcd(eval_mk, elem)
-                if d == self.fx.mul_id() or d == elem:
+                if d.degree() == 0 or d == elem:
                     _Hp.append(elem)
                 else:
+                    # print("d: ", d)
+                    # print("elem: ", elem)
                     _Hp.append(d)
+                    # print("Div :", self.fx.div(elem, d))
                     _Hp.append(self.fx.div(elem, d))
             _H = _Hp
         return _H
 
     def compute(self):
         step1 = self.distinct_degree_factorization()
-
+        # print("Step 1 result: ", step1)
+        # for pol in step1:
+        #    print(self.fx.obtain_monic_representation(pol[0]))
         res = []
         for elem in step1:
-            res.extend(self.equal_degree_factorization(elem[0], elem[1]))
+            # print("elem for: ", elem)
+            sol = self.equal_degree_factorization(elem[0], elem[1])
+            # print(sol)
+            res.extend(sol)
         return res
 
 

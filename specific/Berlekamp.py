@@ -3,6 +3,7 @@ from functools import reduce
 
 from generic.FiniteField import FiniteField
 from generic.Polynomial import Polynomial
+from generic.PolynomialsOverField import PolynomialsOverField
 from specific.PolynomialsOverFq import PolynomialsOverFq
 from specific.Zp import Zp
 
@@ -13,11 +14,13 @@ class Berlekamp:
         # field = Fq, f = f, fx = F[X]
         self.field = f.base_ring
         self.f = f
-        self.fx = PolynomialsOverFq(f.base_ring)
+        self.fx = PolynomialsOverField(f.base_ring)
         self._l = f.degree()
 
     def compute(self):
+        print("Computando base...")
         base = self.step_b1()
+        print("Buscando elemento aleatorio")
         return self.step_b2(base)
 
     # elem is an element in F[X]
@@ -34,6 +37,8 @@ class Berlekamp:
         # we do this by making all calculations on F[X] and then computing the associated elements in E via rem with f.
         alpha = self.fx.exp(xi, self.field.cardinality())
         alpha = self.rep(alpha)
+
+        print("Tengo el representante")
 
         # beta = 1_E, no quotient needed in this case.
         beta = self.fx.mul_id()
@@ -81,8 +86,8 @@ class Berlekamp:
     def m1(self):
         coefs = []
         if self.field.p > 2:
-            coefs = [self.field.add_id()] * ((self.field.cardinality() - 1) / 2 + 1)
-            coefs[(self.field.cardinality() - 1) / 2] = self.field.mul_id()
+            coefs = [self.field.add_id()] * ((self.field.cardinality() - 1) // 2 + 1)
+            coefs[(self.field.cardinality() - 1) // 2] = self.field.mul_id()
             coefs[0] = self.field.add_inv(self.field.add_id())
         else:
             # 1 + X^2 + X^4 + ...
@@ -102,10 +107,12 @@ class Berlekamp:
         f_zero = self.field.add_id()
 
         # identity matrix
-        x_matrix = [[f_one if row == col else f_zero for col in range(len(q_matrix[0]))] for row in range(len(q_matrix))]
+        x_matrix = [[copy.deepcopy(f_one) if row == col else copy.deepcopy(f_zero) for col in range(len(q_matrix[0]))] for row in range(len(q_matrix))]
 
         r = -1
         for j in range(len(q_matrix[0])):
+            print("Q matrix: ", q_matrix)
+            print("X matrix: ", x_matrix)
             _l = -1
             i = r
             while _l == -1 and i < len(q_matrix)-1:
@@ -140,28 +147,50 @@ class Berlekamp:
                         # Row_i(B) = Row_i(B) - B(i, j) * Row_r(B)
                         aux = [self.field.add_inv(self.field.mul(q_matrix[_i][j], x)) for x in q_matrix[r]]
                         q_matrix[_i] = [self.field.add(x, y) for x, y in zip(q_matrix[_i], aux)]
-        print("x_matrix:", x_matrix)
-        return q_matrix, x_matrix[-(r+1):]
+        r += 1
+        return q_matrix, x_matrix[-(len(q_matrix)-r):]
 
 
 if __name__ == "__main__":
+
+    # Z3 = Zp(3)
+    # matrix = [[0, 1, 1], [2, 1, 2], [2, 2, 0]]
+    # elimination, change = Berlekamp(Polynomial([1], Z3)).gaussian_elimination(matrix)
+    # print(".............")
+    # print(change)
+    # print(elimination)
+    #
+    # F4 = FiniteField(2, 2, Polynomial([1, 1, 1], Zp(2)))
+    # F4One = F4.mul_id()
+    # F4Zero = F4.add_id()
+    # F4Alpha = Polynomial([0, 1], Zp(2))
+    # F4AlphaPlusOne = Polynomial([1, 1], Zp(2))
+    # f = Polynomial([F4Alpha, F4AlphaPlusOne, F4One], F4)
+    # print(".............")
+    # print(Berlekamp(f).step_b1())
+    #
+    # print(".............")
+    # print("Compute factorization through Berkelamp's algorithm")
+    # print(Berlekamp(f).step_b2([Polynomial([F4One], F4), Polynomial([F4Zero, F4One], F4)]))
+    # print(Berlekamp(f).compute())
+    # factors = Berlekamp(f).compute()
+    # for factor in factors:
+    #     print("Factor", PolynomialsOverField(F4).obtain_monic_representation(factor))
+    #
+    # Z7 = Zp(7)
+    # g = Polynomial([6,11,6,1], Z7)
+    # factors = Berlekamp(g).compute()
+    # for factor in factors:
+    #     print("Factor", PolynomialsOverField(Z7).obtain_monic_representation(factor))
+
+    # Z6473 = Zp(1201)
+    # g = Polynomial([-40, -62, -21, 2,1], Z6473)
+    # factors = Berlekamp(g).compute()
+    # for factor in factors:
+    #     print("Factor", PolynomialsOverField(Z6473).obtain_monic_representation(factor))
+
     Z3 = Zp(3)
-    matrix = [[0, 1, 1], [2, 1, 2], [2, 2, 0]]
-    elimination, change = Berlekamp(Polynomial([1], Z3)).gaussian_elimination(matrix)
-    print(".............")
-    print(change)
-    print(elimination)
-
-    F4 = FiniteField(2, 2, Polynomial([1, 1, 1], Zp(2)))
-    F4One = F4.mul_id()
-    F4Zero = F4.add_id()
-    F4Alpha = Polynomial([0, 1], Zp(2))
-    F4AlphaPlusOne = Polynomial([1, 1], Zp(2))
-    f = Polynomial([F4Alpha, F4AlphaPlusOne, F4One], F4)
-    print(".............")
-    print(Berlekamp(f).step_b1())
-
-    print(".............")
-    print("Compute factorization through Berkelamp's algorithm")
-    print(Berlekamp(f).step_b2([Polynomial([F4One], F4), Polynomial([F4Zero, F4One], F4)]))
-
+    g = Polynomial([1, 1, 2, 3, 1], Z3)
+    factors = Berlekamp(g).compute()
+    for factor in factors:
+        print("Factor", PolynomialsOverField(Z3).obtain_monic_representation(factor))

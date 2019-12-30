@@ -1,3 +1,5 @@
+import random
+
 from generic.Field import Field
 from specific.ZZ import ZZ
 
@@ -6,6 +8,7 @@ class Zp(Field):
 
     def __init__(self, p):
         self.p = p
+        self.k = 1
 
     def mul_inv(self, elem):
         _, d, _ = ZZ().extended_gcd(elem, self.p)
@@ -31,6 +34,9 @@ class Zp(Field):
 
     def cardinality(self):
         return self.p
+
+    def random_elem(self):
+        return random.randint(0, self.p-1)
 
     def __eq__(self, other):
         if isinstance(other, Zp):

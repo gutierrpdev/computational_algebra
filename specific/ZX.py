@@ -1,7 +1,7 @@
 from generic.Ring import Ring
 from generic.Polynomial import Polynomial
 from specific.ZZ import ZZ
-
+from functools import reduce
 
 class ZX(Ring):
     def add_id(self):
@@ -99,6 +99,12 @@ class ZX(Ring):
             remainder = [ZZ().add_id()]
         return quotient, remainder  # return quotient, remainder.
 
+    def maxnorm(self, f):
+        return reduce(lambda x,y: max(abs(x),abs(y)), f.coefs)
+
+    def onenorm(self, f):
+        return reduce(lambda x,y: abs(x) + abs(y), f.coefs)
+
 
 if __name__ == "__main__":
     ZX = ZX()
@@ -112,6 +118,7 @@ if __name__ == "__main__":
     _h = Polynomial([5, 3], ZZ())
     _i = Polynomial([1, 1], ZZ())
     _j = Polynomial([1, 2], ZZ())
+    _k = Polynomial([-5, 3, -7, -2], ZZ())
     # print(ZX.extended_synthetic_division(_c.coefs, _a.coefs))
     # print(ZX.mcd_polynomial_coefs(_d))
     # print(ZX.primitive_part(_d).coefs)
@@ -121,3 +128,5 @@ if __name__ == "__main__":
     print(ZX.gcd(_e, _f).coefs)
     print(ZX.gcd(_g, _h).coefs)
     print(ZX.gcd(_i, _j).coefs)
+    print(ZX.maxnorm(_k))
+    print(ZX.onenorm(_k))

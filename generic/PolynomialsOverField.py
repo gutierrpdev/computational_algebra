@@ -52,6 +52,9 @@ class PolynomialsOverField(EuclideanDomain):
     def mul_field_scalar(self, elem, f_scalar):
         return Polynomial([self.base_field.mul(x, f_scalar) for x in elem.coefs], self.base_field)
 
+    def obtain_monic_representation(self, elem):
+        return self.mul_field_scalar(elem, self.base_field.mul_inv(elem.coefs[elem.degree()]))
+
     # given polynomial f, compute f(v)
     def evaluate_polynomial(self, f, v):
         res = []
