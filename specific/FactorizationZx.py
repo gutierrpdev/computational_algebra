@@ -1,16 +1,14 @@
-from math import ceil, sqrt
-
 import copy
+from itertools import combinations
+from math import ceil, sqrt
 
 from generic.Polynomial import Polynomial
 from generic.PolynomialsOverField import PolynomialsOverField
-from specific.Berlekamp import Berlekamp
 from specific.CantorZassenhaus import CantorZassenhaus
-from specific.PolynomialsOverFq import PolynomialsOverFq
 from specific.ZX import ZX
-from specific.Zp import Zp
 from specific.ZZ import ZZ
-from itertools import combinations
+from specific.Zp import Zp
+
 
 class FactorizationZx:
 
@@ -19,14 +17,15 @@ class FactorizationZx:
         self.n = f.degree()
         self.A = ZX().maxnorm(self.f)
 
-    def symmetrical_representation_number(self, number, p):
-        if number > (p-1) // 2:
+    @staticmethod
+    def symmetrical_representation_number(number, p):
+        if number > (p - 1) // 2:
             return number - p
         else:
             return number
 
     def symmetric_form(self, pol, p):
-        return Polynomial([self.symmetrical_representation_number(x,p) for x in pol.coefs], pol.base_ring)
+        return Polynomial([self.symmetrical_representation_number(x, p) for x in pol.coefs], pol.base_ring)
 
     def modular_factorization(self, f_bar, p, fx):
         # f_bar_decomposition = Berlekamp(f_bar).compute()
@@ -39,9 +38,9 @@ class FactorizationZx:
         if self.n == 1:
             return [self.f]
         b = self.f.get_leading_coef()
-        B = ceil(sqrt(self.n + 1) * pow(2,self.n) * self.A * b)
+        B = ceil(sqrt(self.n + 1) * pow(2, self.n) * self.A * b)
 
-        p = ZZ().obtain_random_prime_in_range(2*B + 1, 4*B - 1)
+        p = ZZ().obtain_random_prime_in_range(2 * B + 1, 4 * B - 1)
         f_bar = Polynomial(self.f.coefs, Zp(p))
         f_bar_der = f_bar.derivative()
         fx = PolynomialsOverField(Zp(p))
@@ -51,13 +50,13 @@ class FactorizationZx:
             f_bar = Polynomial(self.f.coefs, Zp(p))
             f_bar_der = f_bar.derivative()
 
-        g_i = self.modular_factorization(f_bar,p,fx)
+        g_i = self.modular_factorization(f_bar, p, fx)
         r = len(g_i)
         f_star = copy.deepcopy(self.f)
         T = set(range(r))
         s = 1
         G = []
-        while 2*s <= len(T):
+        while 2 * s <= len(T):
             goto = False
             combination = list(combinations(T, s))
             for subset_tuple in combination:
@@ -76,8 +75,6 @@ class FactorizationZx:
         G.append(f_star)
         return G
 
-
-
     def obtain_factors(self, T, g_i, fx, b, p):
         g = fx.mul_id()
         for index in T:
@@ -86,7 +83,8 @@ class FactorizationZx:
         g_star_module_p = Polynomial([x % p for x in g_star.coefs], ZX())
         return self.symmetric_form(g_star_module_p, p)
 
+
 if __name__ == "__main__":
-    g = Polynomial([-15,-17,-16,-1,1], ZZ())
+    g = Polynomial([-15, -17, -16, -1, 1], ZZ())
     fact = FactorizationZx(g)
     print(fact.factorize_big_prime())

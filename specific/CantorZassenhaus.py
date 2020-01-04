@@ -3,6 +3,7 @@ import copy
 from generic.Polynomial import Polynomial
 from generic.PolynomialsOverField import PolynomialsOverField
 
+
 class CantorZassenhaus:
 
     def __init__(self, f):

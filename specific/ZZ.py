@@ -26,7 +26,7 @@ class ZZ(EuclideanDomain):
         return elem1 * elem2
 
     def mul_scalar(self, elem, scalar):
-        return elem*scalar
+        return elem * scalar
 
     @staticmethod
     def miller_rabin_prime_check(n, k=4):
@@ -57,6 +57,7 @@ class ZZ(EuclideanDomain):
     '''
     :returns: input expressed as 2^r * d + 1
     '''
+
     @staticmethod
     def rd_form(n):
         r = 0
@@ -70,12 +71,14 @@ class ZZ(EuclideanDomain):
     Obtains a random prime in a range, performing Miller-Rabin with given k.
     This method is used for factoring in Z[X]
     '''
+
     @staticmethod
-    def obtain_random_prime_in_range(a,b, k = 4):
+    def obtain_random_prime_in_range(a, b, k=4):
         while True:
-            c = randint(a,b)
+            c = randint(a, b)
             if ZZ.miller_rabin_prime_check(c, k):
                 return c
+
 
 if __name__ == "__main__":
     ZZ = ZZ()
