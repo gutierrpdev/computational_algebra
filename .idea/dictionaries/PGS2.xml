@@ -3,9 +3,12 @@
     <words>
       <w>berkelamp</w>
       <w>berlekamp</w>
+      <w>buchberger</w>
       <w>coef</w>
       <w>coefs</w>
       <w>ffcompp</w>
+      <w>grlex</w>
+      <w>groebner</w>
       <w>monic</w>
       <w>multidegree</w>
       <w>multivariable</w>

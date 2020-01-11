@@ -19,17 +19,30 @@ class MultivariablePolynomial:
         else:
             return False
 
+    @staticmethod
+    def monomial_less_grlex(m1, m2):
+        sum_alpha = sum(m1)
+        sum_beta = sum(m2)
+        if sum_alpha < sum_beta:
+            return True
+        elif sum_alpha > sum_beta:
+            return False
+        else:
+            return MultivariablePolynomial.monomial_less(m1, m2)
+
     def multidegree(self):
         i = 0
         max_m = None
         for elem in self.coefs:
             if max_m is None:
                 max_m = elem
-            elif self.monomial_less(max_m, elem):
+            elif self.monomial_less_grlex(max_m, elem):
                 max_m = elem
         return max_m
 
     def leading_coef(self):
+        if len(self.coefs) == 0:
+            return self.base_field.add_id()
         return self.coefs[self.md]
 
     def leading_monomial(self):
@@ -40,6 +53,9 @@ class MultivariablePolynomial:
 
     def __repr__(self):
         return str(self.coefs)
+
+    def __eq__(self, other):
+        return self.coefs == other.coefs
 
 
 if __name__ == "__main__":
