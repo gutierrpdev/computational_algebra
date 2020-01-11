@@ -38,6 +38,19 @@ class MultivariablePolynomialsOverField:
                 return None
         return MultivariablePolynomial({tuple(res): self.field.div(p1_item[1], p2_item[1])}, self.field)
 
+    # takes two single-term Multivariable Polynomials and returns the product of the two
+    def mul_term(self, p1, p2):
+        # only allow single-term Polynomials here
+        if len(p1.coefs) != len(p2.coefs) or len(p1.coefs) != 1:
+            return None
+        p1_item = list(p1.coefs.items())[0]
+        p2_item = list(p2.coefs.items())[0]
+        res = [0] * len(p1_item[0])
+
+        for i in range(len(p1_item[0])):
+            res[i] = p1_item[0][i] + p2_item[0][i]
+        return MultivariablePolynomial({tuple(res): self.field.mul(p1_item[1], p2_item[1])}, self.field)
+
 
 if __name__ == "__main__":
     from specific.ZZ import ZZ
@@ -56,3 +69,4 @@ if __name__ == "__main__":
     print("p3 = ", p3)
     print("p4 = ", p4)
     print("p3 / p4 = ", MultivariablePolynomialsOverField(ZZ()).div_term(p3, p4))
+    print("p3 * p4 = ", MultivariablePolynomialsOverField(ZZ()).mul_term(p3, p4))
