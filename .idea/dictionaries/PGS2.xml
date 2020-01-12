@@ -9,9 +9,13 @@
       <w>ffcompp</w>
       <w>grlex</w>
       <w>groebner</w>
+      <w>hensel</w>
+      <w>maxnorm</w>
       <w>monic</w>
       <w>multidegree</w>
+      <w>multifactor</w>
       <w>multivariable</w>
+      <w>onenorm</w>
       <w>primality</w>
       <w>suma</w>
       <w>zassenhaus</w>

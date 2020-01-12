@@ -3,6 +3,7 @@ from generic.Polynomial import Polynomial
 from specific.ZZ import ZZ
 from functools import reduce
 
+
 class ZX(Ring):
     def add_id(self):
         return Polynomial([0], ZZ())
@@ -99,11 +100,18 @@ class ZX(Ring):
             remainder = [ZZ().add_id()]
         return quotient, remainder  # return quotient, remainder.
 
-    def maxnorm(self, f):
-        return reduce(lambda x,y: max(abs(x),abs(y)), f.coefs)
+    @staticmethod
+    def maxnorm(f):
+        return reduce(lambda x, y: max(abs(x), abs(y)), f.coefs)
 
-    def onenorm(self, f):
-        return reduce(lambda x,y: abs(x) + abs(y), f.coefs)
+    @staticmethod
+    def onenorm(f):
+        return reduce(lambda x, y: abs(x) + abs(y), f.coefs)
+
+    # compute f mod m, where m is an element of ZZ
+    @staticmethod
+    def mod_elem(f, m):
+        return Polynomial([elem % m for elem in f.coefs], ZZ())
 
 
 if __name__ == "__main__":
