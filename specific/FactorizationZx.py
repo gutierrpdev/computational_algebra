@@ -224,7 +224,7 @@ if __name__ == "__main__":
     print(fact.factorize_prime_power())
 
     p_big = Polynomial([-12, -24, -18, -2, 8, 3, 0, 2, 1], ZZ())
-    print(FactorizationZx(p_big).factorize_big_prime())
+    # print(FactorizationZx(p_big).factorize_big_prime())
     print(FactorizationZx(p_big).factorize_prime_power())
 
     m = 5

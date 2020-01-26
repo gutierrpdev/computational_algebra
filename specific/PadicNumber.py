@@ -1,9 +1,10 @@
-from generic.EuclideanDomain import EuclideanDomain
+from generic.Field import Field
 from specific.ZZ import ZZ
+
 
 # p-adic numbers are represented as tuples of the form (a,b), where n = a/b. This
 # is the fraction representation.
-class PadicNumber(EuclideanDomain):
+class PadicNumber(Field):
 
     def __init__(self, p):
         self.p = p
@@ -39,14 +40,16 @@ class PadicNumber(EuclideanDomain):
         return 0, 1
 
     # Obtains primitive form of a fraction
-    def simplify(self, elem):
+    @staticmethod
+    def simplify(elem):
         a, b = elem
         if a == 0:
             return 0, 1
-        gcd = ZZ().gcd(a,b)
+        gcd = ZZ().gcd(a, b)
         return a // gcd, b // gcd
 
-    def symmetric_representation(self, elem, mod):
+    @staticmethod
+    def symmetric_representation(elem, mod):
         if abs(elem) > (mod-1) // 2:
             if elem < 0:
                 return mod + elem
@@ -69,11 +72,11 @@ class PadicNumber(EuclideanDomain):
 
         # |sigma|p < |tau|p
         if c2 < c1:
-            return divisor, (0,1,0)
+            return divisor, (0, 1, 0)
 
         # Otherwise
-        s = (a*d) % self.p **(c2-c1+1)
-        t = (b*c) % self.p **(c2-c1+1)
+        s = (a*d) % self.p ** (c2-c1+1)
+        t = (b*c) % self.p ** (c2-c1+1)
 
         _, t_inv, _ = ZZ().extended_gcd(t, self.p**(c2-c1+1))
         quotient = self.symmetric_representation((s*t_inv) % self.p**(c2-c1+1), self.p**(c2-c1+1))
@@ -104,7 +107,7 @@ class PadicNumber(EuclideanDomain):
         c, d = elem2
         num = a*d + b*c
         div = b*d
-        return self.simplify((num,div))
+        return self.simplify((num, div))
 
     def add_inv(self, elem):
         return -elem[0], elem[1]
@@ -114,15 +117,21 @@ class PadicNumber(EuclideanDomain):
         c, d = elem2
         num = a*c
         div = b*d
-        return self.simplify((num,div))
+        return self.simplify((num, div))
+
+    def mul_inv(self, elem):
+        return elem[1], elem[0]
+
+    def div(self, elem1, elem2):
+        return self.mul(elem1, self.mul_inv(elem2))
 
     # Given a fraction of form (a,b), with n = a/b; obtains p-adic representation of the form
     # n = c / d * p^v, where gcd(c,p) = 1 and gcd(d,p) = 1.
     def obtain_padic_representation(self, number):
         if len(number) == 3:
             return number
-        a,b = number
-        c1, c2 = 0,0
+        a, b = number
+        c1, c2 = 0, 0
         while a != 0 and a % self.p == 0:
             c1 += 1
             a //= self.p
@@ -131,10 +140,10 @@ class PadicNumber(EuclideanDomain):
             b //= self.p
         return a, b, c1 - c2
 
+
 if __name__ == "__main__":
     p7 = PadicNumber(7)
     n1 = 181625, 11
     n2 = 10555, 2
     print(p7.p_adicEuclideanAlgorithm(n1, n2))
     print(p7.gcd(n1, n2))
-    

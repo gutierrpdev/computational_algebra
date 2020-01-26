@@ -1,11 +1,14 @@
 <component name="ProjectDictionaryState">
   <dictionary name="PGS2">
     <words>
+      <w>adic</w>
       <w>berkelamp</w>
       <w>berlekamp</w>
       <w>buchberger</w>
+      <w>cociente</w>
       <w>coef</w>
       <w>coefs</w>
+      <w>dividendo</w>
       <w>ffcompp</w>
       <w>grlex</w>
       <w>groebner</w>
@@ -16,7 +19,10 @@
       <w>multifactor</w>
       <w>multivariable</w>
       <w>onenorm</w>
+      <w>padic</w>
+      <w>padics</w>
       <w>primality</w>
+      <w>resto</w>
       <w>suma</w>
       <w>zassenhaus</w>
     </words>

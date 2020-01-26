@@ -18,9 +18,7 @@ class Berlekamp:
         self._l = f.degree()
 
     def compute(self):
-        print("Computando base...")
         base = self.step_b1()
-        print("Buscando elemento aleatorio")
         return self.step_b2(base)
 
     # elem is an element in F[X]
